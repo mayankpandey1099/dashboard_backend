@@ -1,20 +1,79 @@
 import User from "../models/User";
 import { IApiResponse, IUser } from "../utils/Types";
+import bcrypt from "bcryptjs";
 
 export class UserService {
-  async getAllUsers(): Promise<IApiResponse<IUser[]>> {
+  async updateUser(
+    id: string,
+    data: {
+      username?: string;
+      email?: string;
+      password?: string;
+      role?: "admin" | "player";
+    }
+  ): Promise<IApiResponse<IUser>> {
     try {
-      const users = await User.find();
+      const updateData: any = {};
+      if (data.username) updateData.username = data.username;
+      if (data.email) updateData.email = data.email;
+      if (data.password)
+        updateData.password = await bcrypt.hash(data.password, 10);
+      if (data.role) updateData.role = data.role;
+
+      const user = await User.findByIdAndUpdate(id, updateData, { new: true });
+      if (!user) {
+        return {
+          data: null,
+          status: 404,
+          message: "User not found",
+        };
+      }
+
+      const userResponse: IUser = {
+        id: user._id.toString(),
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        bananaCount: user.bananaCount,
+        isBlocked: user.isBlocked,
+        isActive: user.isActive,
+        createdAt: user.createdAt,
+      };
+
       return {
-        data: users,
+        data: userResponse,
         status: 200,
-        message: "Users fetched successfully",
+        message: "User updated successfully",
       };
     } catch (error) {
       return {
         data: null,
-        status: 500,
-        message: "Error fetching users",
+        status: 400,
+        message: (error as Error).message,
+      };
+    }
+  }
+
+  async deleteUser(id: string): Promise<IApiResponse<any>> {
+    try {
+      const user = await User.findByIdAndDelete(id);
+      if (!user) {
+        return {
+          data: null,
+          status: 404,
+          message: "User not found",
+        };
+      }
+      return {
+        data: null,
+        status: 200,
+        message: "User deleted successfully",
+      };
+    } catch (error) {
+      return {
+        data: null,
+        status: 400,
+        message: (error as Error).message,
       };
     }
   }
@@ -71,34 +130,6 @@ export class UserService {
         data: null,
         status: 500,
         message: "Error unblocking user",
-      };
-    }
-  }
-
-  async clickBanana(userId: string): Promise<IApiResponse<IUser>> {
-    try {
-      const user = await User.findByIdAndUpdate(
-        userId,
-        { $inc: { bananaCount: 1 } },
-        { new: true }
-      );
-      if (!user) {
-        return {
-          data: null,
-          status: 404,
-          message: "User not found",
-        };
-      }
-      return {
-        data: user,
-        status: 200,
-        message: "Banana clicked",
-      };
-    } catch (error) {
-      return {
-        data: null,
-        status: 500,
-        message: "Error clicking banana",
       };
     }
   }

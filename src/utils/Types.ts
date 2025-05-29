@@ -1,7 +1,7 @@
-export interface IUser extends Document {
+export interface IUser {
+  id: string;
   username: string;
   email: string;
-  password: string;
   role: "player" | "admin";
   bananaCount: number;
   isBlocked: boolean;

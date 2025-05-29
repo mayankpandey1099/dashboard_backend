@@ -31,8 +31,19 @@ export class AuthService {
       });
       await user.save();
 
+      const userResponse: IUser = {
+        id: user._id.toString(),
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        bananaCount: user.bananaCount,
+        isBlocked: user.isBlocked,
+        isActive: user.isActive,
+        createdAt: user.createdAt
+      };
+
       return {
-        data: user,
+        data: userResponse,
         status: 201,
         message: "User registered successfully",
       };
@@ -50,7 +61,7 @@ export class AuthService {
     password: string
   ): Promise<IApiResponse<{ user: IUser; token: string }>> {
     try {
-      const user = await User.findOne({ email });
+      const user: any = await User.findOne({ email });
       if (!user || user.isBlocked) {
         return {
           data: null,
@@ -77,8 +88,19 @@ export class AuthService {
       user.isActive = true;
       await user.save();
 
+      const userResponse: IUser = {
+        id: user._id.toString(),
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        bananaCount: user.bananaCount,
+        isBlocked: user.isBlocked,
+        isActive: user.isActive,
+        createdAt: user.createdAt,
+      };
+
       return {
-        data: { user, token },
+        data: { user: userResponse, token },
         status: 200,
         message: "Login successful",
       };
