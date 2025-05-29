@@ -4,12 +4,23 @@ import cors from "cors";
 import connectDB from "./config/db";
 import authRoutes from "./routes/authRoutes";
 import userRoutes from "./routes/userRoutes";
+import http from "http";
+import { Server } from "socket.io";
+import { SocketService } from "./services/socketService";
 
 dotenv.config();
 
 const app: Express = express();
 const port = process.env.PORT || 5000;
 connectDB();
+
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+  },
+});
 
 app.use(
   cors({
@@ -34,6 +45,9 @@ app.get("/", (req: Request, res: Response) => {
   });
 });
 
-app.listen(port, () => {
+const socketService = new SocketService(io);
+socketService.setupSocket();
+
+server.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });

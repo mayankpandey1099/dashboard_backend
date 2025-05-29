@@ -85,9 +85,6 @@ export class AuthService {
         { expiresIn: "1h" }
       );
 
-      user.isActive = true;
-      await user.save();
-
       const userResponse: IUser = {
         id: user._id.toString(),
         username: user.username,
