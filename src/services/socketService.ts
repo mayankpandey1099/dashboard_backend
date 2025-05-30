@@ -38,7 +38,7 @@ export class SocketService {
 
         socket.emit("bananaCount", { bananaCount: user.bananaCount });
 
-        const users = await User.find({ _id: { $ne: user._id } }).select(
+        const users = await User.find().select(
           "username email bananaCount isActive"
         );
 
@@ -59,7 +59,7 @@ export class SocketService {
         await user.save();
         socket.emit("bananaCount", { bananaCount: user.bananaCount });
 
-        const users = await User.find({ _id: { $ne: user._id } }).select(
+        const users = await User.find().select(
           "username email bananaCount isActive"
         );
 
