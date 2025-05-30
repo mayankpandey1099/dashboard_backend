@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import { AuthService } from "../services/authService";
+import User from "../models/User";
+import { SocketService } from "../services/socketService";
 
 const authService = new AuthService();
 
@@ -12,6 +14,13 @@ export class AuthController {
       password,
       role
     );
+    if (response.status === 201) {
+      const user = response.data;
+      const users = await User.find().select(
+        "username email bananaCount isActive"
+      );
+      SocketService.getIO().emit("activeUsers", users);
+    }
     res.status(response.status).json(response);
   }
 
