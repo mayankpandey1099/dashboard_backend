@@ -31,10 +31,11 @@ export class SocketService {
 
         socket.emit("bananaCount", { bananaCount: user.bananaCount });
 
-        const activeUsers = await User.find({ isActive: true }).select(
+        const users = await User.find({ _id: { $ne: user._id } }).select(
           "username email bananaCount isActive"
         );
-        this.io.emit("activeUsers", activeUsers);
+
+        this.io.emit("activeUsers", users);
 
         const ranking = await User.find({ role: "player" })
           .select("username email bananaCount")
@@ -51,10 +52,11 @@ export class SocketService {
         await user.save();
         socket.emit("bananaCount", { bananaCount: user.bananaCount });
 
-        const activeUsers = await User.find({ isActive: true }).select(
+        const users = await User.find({ _id: { $ne: user._id } }).select(
           "username email bananaCount isActive"
         );
-        this.io.emit("activeUsers", activeUsers);
+
+        this.io.emit("activeUsers", users);
 
         const ranking = await User.find({ role: "player" })
           .select("username email bananaCount")
